@@ -43,4 +43,4 @@ sIntersperse a sa | S.null sa = sa
                   | otherwise = let res = foldr (\e s -> e <| a <| s) S.empty sa in S.take (length res - 1) res
 
 lineEnvironments :: MonadResource m => (Int, Int) -> (BS.ByteString -> Bool) -> Conduit BS.ByteString m BS.ByteString
-lineEnvironments env pred = environments env "\n" pred =$= CL.map (flip BS.snoc $ fromIntegral $ ord '\n')
+lineEnvironments env pred = CB.lines =$= environments env "\n" pred =$= CL.map (flip BS.snoc $ fromIntegral $ ord '\n')
