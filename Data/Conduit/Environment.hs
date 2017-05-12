@@ -7,11 +7,13 @@ import Control.Monad.Trans.Resource
 import Control.Monad.IO.Class
 import Data.Conduit
 import qualified Data.Conduit.Binary as CB
+import qualified Data.Conduit.List as CL
 import qualified Data.Sequence as S
 import qualified Data.ByteString as BS
 import Data.Sequence (Seq, (|>), (<|))
 import Data.Monoid
 import Data.List
+import Data.Char
 import Control.Exception
 
 environments :: forall a m. ({-Show a, -}MonadResource m, Monoid a) => (Int, Int) -> a -> (a -> Bool) -> Conduit a m a
@@ -41,4 +43,4 @@ sIntersperse a sa | S.null sa = sa
                   | otherwise = let res = foldr (\e s -> e <| a <| s) S.empty sa in S.take (length res - 1) res
 
 lineEnvironments :: MonadResource m => (Int, Int) -> (BS.ByteString -> Bool) -> Conduit BS.ByteString m BS.ByteString
-lineEnvironments env pred = environments env "\n" pred
+lineEnvironments env pred = environments env "\n" pred =$= CL.map (flip BS.snoc $ fromIntegral $ ord '\n')
